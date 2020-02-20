@@ -6,7 +6,7 @@ import base64
 from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
 import config as CONFIG
-
+import pickle
 
 def configure_port():
     context = zmq.Context()
