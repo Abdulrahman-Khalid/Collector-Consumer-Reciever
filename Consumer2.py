@@ -33,6 +33,7 @@ def get_contours(frameNum, image):
 
 
 def msg_to_image(message):
+    message = pickle.loads(message)
     frameNum = message["frameNum"]
     image = message["img"]
     image = bytearray(base64.b64decode(image))

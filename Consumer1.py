@@ -4,6 +4,7 @@ import _thread
 import base64
 from skimage.filters import threshold_otsu
 import config as CONFIG
+import pickle
 
 
 def configure_port():
@@ -25,6 +26,7 @@ def apply_threshold(image):
 
 
 def msg_to_image(message):
+    message = pickle.loads(message)
     frameNum = message["frameNum"]
     image = message["img"]
     image = bytearray(base64.b64decode(image))
@@ -32,10 +34,11 @@ def msg_to_image(message):
 
 
 def image_to_msg(frameNum, frame):
-    bytesArr = bytearray(frame)
-    imgToString = base64.b64encode(bytesArr)
-    msg = {"frameNum": frameNum, "img": imgToString}
+    imgToString = base64.b64encode(frame)
+    msgD = {"frameNum": frameNum, "img": imgToString}
+    msg = pickle.dumps(msgD)
     return msg
+
 
 
 def thread_function(senderSocket, receiverSocket):

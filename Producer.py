@@ -3,6 +3,8 @@ import zmq
 import numpy
 import base64
 import config as CONFIG
+import pickle
+
 
 
 def video_to_frames(video):
@@ -30,9 +32,9 @@ def configure_port():
 
 
 def image_to_msg(frameNum, frame):
-    bytesArr = bytearray(frame)
-    imgToString = base64.b64encode(bytesArr)
-    msg = {"frameNum": frameNum, "img": imgToString}
+    imgToString = base64.b64encode(frame)
+    msgD = {"frameNum": frameNum, "img": imgToString}
+    msg = pickle.dumps(msgD)
     return msg
 
 
