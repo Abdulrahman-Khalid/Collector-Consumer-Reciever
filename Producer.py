@@ -6,7 +6,6 @@ import config as CONFIG
 import pickle
 
 
-
 def video_to_frames(video):
     frames = []
     while(True):
