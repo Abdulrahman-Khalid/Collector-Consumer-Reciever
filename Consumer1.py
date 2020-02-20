@@ -40,7 +40,6 @@ def image_to_msg(frameNum, frame):
     return msg
 
 
-
 def thread_function(senderSocket, receiverSocket):
     while True:
         message = receiverSocket.recv()
@@ -59,3 +58,6 @@ try:
         threadCount -= 1
 except:
     print("Error: unable to start threading")
+
+while True:
+    pass

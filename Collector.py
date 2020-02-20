@@ -27,11 +27,14 @@ def thread_function(senderSocket, receiverSocket):
 
 # Create N threads as follows
 try:
-    threadCount = math.ceil(N / 2)
+    threadCount = math.ceil(CONFIG.N / 2)
     senderSocket, receiverSocket = configure_port()
-    while threadCount:
+    while threadCount > 0:
         _thread.start_new_thread(
             thread_function, (senderSocket, receiverSocket))
         threadCount -= 1
 except:
     print("Error: unable to start threading")
+
+while True:
+    pass

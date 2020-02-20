@@ -8,6 +8,7 @@ from skimage.measure import find_contours
 import config as CONFIG
 import pickle
 
+
 def configure_port():
     context = zmq.Context()
     # recieve work
@@ -63,3 +64,6 @@ try:
         threadCount -= 1
 except:
     print("Error: unable to start threading")
+
+while True:
+    pass
