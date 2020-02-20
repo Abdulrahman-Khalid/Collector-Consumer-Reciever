@@ -52,7 +52,7 @@ def thread_function(senderSocket, receiverSocket):
 try:
     threadCount = CONFIG.N
     senderSocket, receiverSocket = configure_port()
-    while threadCount:
+    while threadCount > 0:
         _thread.start_new_thread(
             thread_function, (senderSocket, receiverSocket))
         threadCount -= 1
