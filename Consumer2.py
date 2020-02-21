@@ -10,6 +10,7 @@ from common_function import *
 
 def get_contours(frameNum, image):
     bounding_boxes = find_contours(image, 0.8)
+    frame_data = []
     for box in bounding_boxes:
         Xvalues = box[:, 1]
         Yvalues = box[:, 0]
@@ -17,7 +18,9 @@ def get_contours(frameNum, image):
         Xmax = (np.max(Xvalues)).astype(np.uint16)
         Ymin = (np.min(Yvalues)).astype(np.uint16)
         Ymax = (np.max(Yvalues)).astype(np.uint16)
-    return pickle.dumps({"frameNum": frameNum, "Xmin": Xmin, "Xmax": Xmax, "Ymin": Ymin, "Ymax": Ymax})
+        frame_data.append({"Xmin": Xmin, "Xmax": Xmax,
+                           "Ymin": Ymin, "Ymax": Ymax})
+    return pickle.dumps({"frameNum": frameNum, "contours": frame_data})
 
 
 senderSocket = configure_Publisher(sys.argv[2])
