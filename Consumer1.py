@@ -8,18 +8,6 @@ import config as CONFIG
 import pickle
 
 
-def configure_port():
-    context = zmq.Context()
-    # recieve work
-    receiverSocket = context.socket(zmq.PULL)
-    receiverSocket.connect("tcp://127.0.0.1:%s" % CONFIG.PRODUCER_SENDER_PORT)
-    # send work
-    senderSocket = context.socket(zmq.PUSH)
-    senderSocket.connect("tcp://127.0.0.1:%s" % CONFIG.CONSUMER1_SENDER_PORT)
-
-    return senderSocket, receiverSocket
-
-
 def apply_threshold(image):
     grayscale = rgb2gray(image)
     thresh = threshold_otsu(grayscale)
@@ -40,23 +28,17 @@ def image_to_msg(frameNum, frame):
     return msg
 
 
-def thread_function(senderSocket, receiverSocket):
+    # Create N threads as follows
+try:
+    receiverSocket = CONFIG.configure_port(
+        CONFIG.SENDER[0], sys.argv[1], zmq.PULL)
+    senderSocket = CONFIG.configure_port(
+        CONFIG.SENDER[0], sys.argv[2], zmq.PUSH)
     while True:
         message = receiverSocket.recv()
         frameNum, image = msg_to_image(message)
         binaryImage = apply_threshold(image)
         senderSocket.send_json(image_to_msg(frameNum, binaryImage))
 
-
-# Create N threads as follows
-try:
-    threadCount = CONFIG.N
-    senderSocket, receiverSocket = configure_port()
-    for i in range(threadCount):
-        _thread.start_new_thread(
-            thread_function, (senderSocket, receiverSocket))
 except:
     print("Error: unable to start threading")
-
-while True:
-    pass

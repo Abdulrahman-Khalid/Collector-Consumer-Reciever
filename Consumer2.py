@@ -10,20 +10,6 @@ import pickle
 import sys
 
 
-def configure_port():
-    context = zmq.Context()
-    # recieve work
-    receiverSocket = context.socket(zmq.PULL)
-    # CONFIG.COLLECTOR_SENDER_PORT)
-    receiverSocket.connect("tcp://{}:{}".format(,))
-    # send work
-    senderSocket = context.socket(zmq.PUSH)
-    # CONFIG.CONSUMER2_SENDER_PORT)
-    senderSocket.connect("tcp://{}:{}".format(,))
-
-    return senderSocket, receiverSocket
-
-
 def get_contours(frameNum, image):
     bounding_boxes = find_contours(image, 0.8)
     for box in bounding_boxes:
@@ -50,11 +36,10 @@ def data_to_msg(data):
 
 # Create N threads as follows
 try:
-    threadCount = CONFIG.N
     receiverSocket = CONFIG.configure_port(
-        CONFIG.SENDER[0], CONFIG.SENDER[1], sys.argv[1])
+        CONFIG.SENDER[0], sys.argv[1], zmq.PULL)
     senderSocket = CONFIG.configure_port(
-        CONFIG.RECIEVER[0], CONFIG.RECIEVER[1], sys.argv[2])
+        CONFIG.RECIEVER[0], sys.argv[2], zmq.PUSH)
     while True:
         message = receiverSocket.recv()
         frameNum, image = msg_to_image(message)
@@ -63,6 +48,3 @@ try:
 
 except:
     print("Error: unable to start threading")
-
-while True:
-    pass

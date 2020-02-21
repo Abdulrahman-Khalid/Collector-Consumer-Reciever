@@ -16,7 +16,8 @@ for port in config.CONSUMER2_SENDER_PORT_VEC:
     # change 24512 to recieved port
     commands.append('python Consumer2.py {} {};'.format(24512, port))
 # change 50023 CONSUMER2 SENDER PORT
-commands.append('python Final_Collector.py {};'.format(50023))
+commands.append('python Final_Collector.py {} {};'.format(
+    50023, outputFilePath))
 
 # run in parallel
 processes = [Popen(cmd, shell=True) for cmd in commands]

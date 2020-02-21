@@ -4,6 +4,7 @@ import numpy
 import base64
 import config as CONFIG
 import pickle
+import sys
 
 
 def video_to_frames(video):
@@ -23,13 +24,6 @@ def read_video_frames(video_path):
     return frames
 
 
-def configure_port():
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    socket.bind("tcp://127.0.0.1:%s" % CONFIG.PRODUCER_SENDER_PORT)
-    return socket
-
-
 def image_to_msg(frameNum, frame):
     msgD = {"frameNum": frameNum, "img": frame}
     msg = pickle.dumps(msgD)
@@ -41,6 +35,6 @@ def send_images(frames, socket):
         socket.send(image_to_msg(idx, frame))
 
 
-socket = configure_port()
-frames = read_video_frames(CONFIG.VIDEO_PATH)
+socket = CONFIG.configure_port(CONFIG.SENDER[0], sys.argv[1], zmq.PUSH)
+frames = read_video_frames(sys.argv[2])
 send_images(frames, socket)
