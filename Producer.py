@@ -1,8 +1,8 @@
 import cv2
 import zmq
 import numpy
-import base64
-import config as CONFIG
+import sys
+from config import * 
 import pickle
 
 
@@ -23,13 +23,6 @@ def read_video_frames(video_path):
     return frames
 
 
-def configure_port():
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    socket.bind("tcp://127.0.0.1:%s" % CONFIG.PRODUCER_SENDER_PORT)
-    return socket
-
-
 def image_to_msg(frameNum, frame):
     msgD = {"frameNum": frameNum, "img": frame}
     msg = pickle.dumps(msgD)
@@ -39,8 +32,13 @@ def image_to_msg(frameNum, frame):
 def send_images(frames, socket):
     for idx, frame in enumerate(frames):
         socket.send(image_to_msg(idx, frame))
+        
 
 
-socket = configure_port()
-frames = read_video_frames(CONFIG.VIDEO_PATH)
+Repliers = []
+for Replier in sys.argv[2:]:
+    Repliers.append(Replier)
+
+socket = configure_Requester(Repliers)
+frames = read_video_frames(str(sys.argv[1]))
 send_images(frames, socket)

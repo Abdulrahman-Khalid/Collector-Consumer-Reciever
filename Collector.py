@@ -1,40 +1,22 @@
-import cv2
 import zmq
-import _thread
-import base64
-import math
-import config as CONFIG
+import sys
+from config import *
 
 
-def configure_port():
-    context = zmq.Context()
-    # recieve work
-    receiverSocket = context.socket(zmq.PULL)
-    receiverSocket.connect("tcp://127.0.0.1:%s" % CONFIG.CONSUMER1_SENDER_PORT)
-    # send work
-    senderSocket = context.socket(zmq.PUSH)
-    senderSocket.connect("tcp://127.0.0.1:%s" % CONFIG.COLLECTOR_SENDER_PORT)
+Publishers = []
+for Publisher in sys.argv[1:3]:
+    Publishers.append(Publisher)
 
-    return senderSocket, receiverSocket
+Repliers = []
+for Replier in sys.argv[3:5]:
+    Repliers.append(Replier)
 
 
-# Define a function for the thread
-def thread_function(senderSocket, receiverSocket):
-    while True:
-        message = receiverSocket.recv()
-        senderSocket.send_json(message)
-
-
-# Create N threads as follows
-try:
-    threadCount = math.ceil(CONFIG.N / 2)
-    senderSocket, receiverSocket = configure_port()
-    while threadCount > 0:
-        _thread.start_new_thread(
-            thread_function, (senderSocket, receiverSocket))
-        threadCount -= 1
-except:
-    print("Error: unable to start threading")
+receiverSocket = configure_Subscriber(Publishers)
+senderSocket = configure_Requester(Repliers)
 
 while True:
-    pass
+    message = receiverSocket.recv()
+    senderSocket.send(message)
+
+
