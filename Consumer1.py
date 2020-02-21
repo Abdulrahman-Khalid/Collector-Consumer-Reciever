@@ -2,6 +2,7 @@ import cv2
 import zmq
 import _thread
 import base64
+from skimage.color import rgb2gray
 from skimage.filters import threshold_otsu
 import config as CONFIG
 import pickle
@@ -20,7 +21,8 @@ def configure_port():
 
 
 def apply_threshold(image):
-    thresh = threshold_otsu(image)
+    grayscale = rgb2gray(image)
+    thresh = threshold_otsu(grayscale)
     binary = image <= thresh
     return binary
 
@@ -29,13 +31,11 @@ def msg_to_image(message):
     message = pickle.loads(message)
     frameNum = message["frameNum"]
     image = message["img"]
-    image = bytearray(base64.b64decode(image))
     return frameNum, image
 
 
 def image_to_msg(frameNum, frame):
-    imgToString = base64.b64encode(frame)
-    msgD = {"frameNum": frameNum, "img": imgToString}
+    msgD = {"frameNum": frameNum, "img": frame}
     msg = pickle.dumps(msgD)
     return msg
 
@@ -52,10 +52,9 @@ def thread_function(senderSocket, receiverSocket):
 try:
     threadCount = CONFIG.N
     senderSocket, receiverSocket = configure_port()
-    while threadCount > 0:
+    for i in range(threadCount):
         _thread.start_new_thread(
             thread_function, (senderSocket, receiverSocket))
-        threadCount -= 1
 except:
     print("Error: unable to start threading")
 

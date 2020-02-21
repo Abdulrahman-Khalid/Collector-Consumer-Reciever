@@ -13,10 +13,12 @@ def configure_port():
     context = zmq.Context()
     # recieve work
     receiverSocket = context.socket(zmq.PULL)
-    receiverSocket.connect("tcp://127.0.0.1:%s" % CONFIG.COLLECTOR_SENDER_PORT)
+    # CONFIG.COLLECTOR_SENDER_PORT)
+    receiverSocket.connect("tcp://{}:{}".format(,))
     # send work
     senderSocket = context.socket(zmq.PUSH)
-    senderSocket.connect("tcp://127.0.0.1:%s" % CONFIG.CONSUMER2_SENDER_PORT)
+    # CONFIG.CONSUMER2_SENDER_PORT)
+    senderSocket.connect("tcp://{}:{}".format())
 
     return senderSocket, receiverSocket
 
@@ -37,7 +39,6 @@ def msg_to_image(message):
     message = pickle.loads(message)
     frameNum = message["frameNum"]
     image = message["img"]
-    image = bytearray(base64.b64decode(image))
     return frameNum, image
 
 
@@ -61,7 +62,6 @@ try:
     while threadCount > 0:
         _thread.start_new_thread(
             thread_function, (senderSocket, receiverSocket))
-        threadCount -= 1
 except:
     print("Error: unable to start threading")
 

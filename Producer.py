@@ -31,8 +31,7 @@ def configure_port():
 
 
 def image_to_msg(frameNum, frame):
-    imgToString = base64.b64encode(frame)
-    msgD = {"frameNum": frameNum, "img": imgToString}
+    msgD = {"frameNum": frameNum, "img": frame}
     msg = pickle.dumps(msgD)
     return msg
 
