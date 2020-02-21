@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
-from common_function import *
+import utils
 
 
 def get_contours(frameNum, image):
@@ -23,11 +23,11 @@ def get_contours(frameNum, image):
     return pickle.dumps({"frameNum": frameNum, "contours": frame_data})
 
 
-senderSocket = configure_Publisher(sys.argv[2])
-receiverSocket = configure_Replier(sys.argv[1])
+senderSocket = utils.configure_Publisher(sys.argv[2])
+receiverSocket = utils.configure_Replier(sys.argv[1])
 
 while True:
     message = receiverSocket.recv()
-    frameNum, image = msg_to_image(message)
+    frameNum, image = utils.msg_to_image(message)
     data = get_contours(frameNum, image)
     senderSocket.send(data)

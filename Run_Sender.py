@@ -1,52 +1,74 @@
 import sys
 import json
 from subprocess import Popen
-from common_function import *
+import utils
+import pickle
+import zmq
 
 
 # Arguments #
-N = int(sys.argv[1])
-videoPath = "./" + str(sys.argv[2])
-outputPath = "./" + str(sys.argv[3])
 
-commands = []
-Consumers1_Receiving_Ports = []
-Consumers1_Sending_Ports = []
 
-Consumers2_Receiving_Ports = []
-Consumers2_Sending_Ports = []
+def main():
+    videoPath = str(sys.argv[1])
+    print("Your ip is: {}".format(utils.get_ip()))
+    print("Your free port is: {}".format(utils.find_free_port()))
+    commands = []
+    Consumers1_Receiving_Ports = []
+    Consumers1_Sending_Ports = []
 
-for i in range(N):
-    Consumers1_Receiving_Ports.append(get_ip() + ":" + str(find_free_port()))
-    Consumers1_Sending_Ports.append(get_ip() + ":" + str(find_free_port()))
-    Consumers2_Receiving_Ports.append(get_ip() + ":" + str(find_free_port()))
-    Consumers2_Sending_Ports.append(get_ip() + ":" + str(find_free_port()))
+    Consumers2_Receiving_Ports = []
+    # Recieve from second computer
+    try:
+        context = zmq.Context()
+        socket = context.socket(zmq.PAIR)
+        socket.connect(
+            "tcp://{}:{}".format(utils.RECIEVER, utils.CONNECTION_PORT))
+        portList = pickle.loads(socket.recv())
+        print("Port list has been recieved")
+        print("reciever: ", portList)
+    except:
+        print("Machine 1 (Sender) ERROR IN Recieving CONNECTION DATA, Try Chaning the CONNECTION_PORT in utils.py file")
 
-#######################################################################################
-Consumers1_Receiving_Ports_string = " ".join(Consumers1_Receiving_Ports)
-commands.append('python Producer.py {} {}'.format(
-    videoPath, Consumers1_Receiving_Ports_string))
-#######################################################################################
-for i in range(N):
-    commands.append('python Consumer1.py {} {}'.format(
-        Consumers1_Receiving_Ports[i], Consumers1_Sending_Ports[i]))
-#######################################################################################
-for i in range(0, N, 2):
-    Two_Receiving_Ports = " ".join(Consumers1_Sending_Ports[i: i+2])
-    Two_Sending_Ports = " ".join(Consumers2_Receiving_Ports[i: i+2])
-    commands.append('python Collector.py {} {}'.format(
-        Two_Receiving_Ports, Two_Sending_Ports))
-#######################################################################################
-for i in range(N):
-    commands.append('python Consumer2.py {} {}'.format(
-        Consumers2_Receiving_Ports[i], Consumers2_Sending_Ports[i]))
-#######################################################################################
-Consumers2_Sending_Ports_string = " ".join(Consumers2_Sending_Ports)
-commands.append('python Final_Collector.py {} {}'.format(
-    outputPath, Consumers2_Sending_Ports_string))
-#######################################################################################
+    for i in range(utils.N):
+        Consumers1_Receiving_Ports.append(
+            utils.SENDER + ":" + str(utils.find_free_port()))
+        Consumers1_Sending_Ports.append(
+            utils.SENDER + ":" + str(utils.find_free_port()))
+        # Consumers2_Receiving_Ports.append(
+        #     utils.get_ip() + ":" + str(utils.find_free_port()))
+        # Consumers2_Sending_Ports.append(
+        #     utils.get_ip() + ":" + str(utils.find_free_port()))
 
-# run in parallel
-processes = [Popen(cmd, shell=True) for cmd in commands]
-for p in processes:
-    p.wait()
+    #######################################################################################
+    Consumers1_Receiving_Ports_string = " ".join(Consumers1_Receiving_Ports)
+    commands.append('python Producer.py {} {}'.format(videoPath,
+                                                      Consumers1_Receiving_Ports_string))
+    #######################################################################################
+    for i in range(utils.N):
+        commands.append('python Consumer1.py {} {}'.format(
+            Consumers1_Receiving_Ports[i], Consumers1_Sending_Ports[i]))
+    #######################################################################################
+    for i in range(0, utils.N, 2):
+        Two_Receiving_Ports = " ".join(Consumers1_Sending_Ports[i: i+2])
+        Two_Sending_Ports = " ".join(Consumers2_Receiving_Ports[i: i+2])
+        commands.append('python Collector.py {} {}'.format(
+            Two_Receiving_Ports, Two_Sending_Ports))
+    #######################################################################################
+    # for i in range(utils.N):
+    #     commands.append('python Consumer2.py {} {}'.format(
+    #         Consumers2_Receiving_Ports[i], Consumers2_Sending_Ports[i]))
+    #######################################################################################
+    # Consumers2_Sending_Ports_string = " ".join(Consumers2_Sending_Ports)
+    # commands.append('python Final_Collector.py {} {}'.format(
+    #     outputPath, Consumers2_Sending_Ports_string))
+    #######################################################################################
+
+    # run in parallel
+    processes = [Popen(cmd, shell=True) for cmd in commands]
+    for p in processes:
+        p.wait()
+
+
+if __name__ == '__main__':
+    main()

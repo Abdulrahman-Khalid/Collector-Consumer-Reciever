@@ -1,6 +1,6 @@
 import zmq
 import sys
-from common_function import *
+import utils
 
 
 Publishers = []
@@ -12,8 +12,8 @@ for Replier in sys.argv[3:5]:
     Repliers.append(Replier)
 
 
-receiverSocket = configure_Subscriber(Publishers)
-senderSocket = configure_Requester(Repliers)
+receiverSocket = utils.configure_Subscriber(Publishers)
+senderSocket = utils.configure_Requester(Repliers)
 
 while True:
     message = receiverSocket.recv()
