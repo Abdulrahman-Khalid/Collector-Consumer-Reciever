@@ -7,6 +7,7 @@ from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
 import config as CONFIG
 import pickle
+import sys
 
 
 def configure_port():
@@ -18,7 +19,7 @@ def configure_port():
     # send work
     senderSocket = context.socket(zmq.PUSH)
     # CONFIG.CONSUMER2_SENDER_PORT)
-    senderSocket.connect("tcp://{}:{}".format())
+    senderSocket.connect("tcp://{}:{}".format(,))
 
     return senderSocket, receiverSocket
 
@@ -47,21 +48,19 @@ def data_to_msg(data):
     return {"frameNum": frameNum, "Xmin": Xmin, "Xmax": Xmax, "Ymin": Ymin, "Ymax": Ymax}
 
 
-def thread_function(senderSocket, receiverSocket):
+# Create N threads as follows
+try:
+    threadCount = CONFIG.N
+    receiverSocket = CONFIG.configure_port(
+        CONFIG.SENDER[0], CONFIG.SENDER[1], sys.argv[1])
+    senderSocket = CONFIG.configure_port(
+        CONFIG.RECIEVER[0], CONFIG.RECIEVER[1], sys.argv[2])
     while True:
         message = receiverSocket.recv()
         frameNum, image = msg_to_image(message)
         data = get_contours(frameNum, image)
         senderSocket.send_json(data_to_msg(data))
 
-
-# Create N threads as follows
-try:
-    threadCount = CONFIG.N
-    senderSocket, receiverSocket = configure_port()
-    while threadCount > 0:
-        _thread.start_new_thread(
-            thread_function, (senderSocket, receiverSocket))
 except:
     print("Error: unable to start threading")
 
