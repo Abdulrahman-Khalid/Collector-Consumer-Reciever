@@ -1,7 +1,7 @@
 import zmq
 import sys
 import pickle
-from config import *
+from common_function import *
 
 Publishers = []
 for Publisher in sys.argv[2:]:

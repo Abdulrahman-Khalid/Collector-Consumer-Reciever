@@ -1,7 +1,7 @@
-from subprocess import Popen
-from config import *
 import sys
 import json
+from subprocess import Popen
+from common_function import *
 
 
 # Arguments #

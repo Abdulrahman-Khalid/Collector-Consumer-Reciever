@@ -1,6 +1,6 @@
 import zmq
 import sys
-from config import *
+from common_function import *
 
 
 Publishers = []

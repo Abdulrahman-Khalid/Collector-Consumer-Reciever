@@ -1,12 +1,11 @@
 import cv2
 import zmq
+import sys
+import pickle
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
-from config import *
-import pickle
-import sys
-
+from common_function import *
 
 def get_contours(frameNum, image):
     bounding_boxes = find_contours(image, 0.8)
@@ -18,13 +17,6 @@ def get_contours(frameNum, image):
         Ymin = (np.min(Yvalues)).astype(np.uint16)
         Ymax = (np.max(Yvalues)).astype(np.uint16)
     return pickle.dumps({"frameNum": frameNum, "Xmin": Xmin, "Xmax": Xmax, "Ymin": Ymin, "Ymax": Ymax})
-
-
-def msg_to_image(message):
-    message = pickle.loads(message)
-    frameNum = message["frameNum"]
-    image = message["img"]
-    return frameNum, image
 
 
 senderSocket = configure_Publisher(sys.argv[2])

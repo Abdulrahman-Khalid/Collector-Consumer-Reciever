@@ -1,8 +1,7 @@
 import cv2
 import zmq
 import sys
-from config import * 
-import pickle
+from common_function import * 
 from skimage.color import rgb2gray
 from skimage.filters import threshold_otsu
 
@@ -12,17 +11,6 @@ def apply_threshold(image):
     thresh = threshold_otsu(grayscale)
     binary = grayscale <= thresh
     return binary
-
-def msg_to_image(message):
-    message = pickle.loads(message)
-    frameNum = message["frameNum"]
-    image = message["img"]
-    return frameNum, image
-
-def image_to_msg(frameNum, frame):
-    msgD = {"frameNum": frameNum, "img": frame}
-    msg = pickle.dumps(msgD)
-    return msg
 
 senderSocket = configure_Publisher(sys.argv[2])
 receiverSocket = configure_Replier(sys.argv[1])

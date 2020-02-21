@@ -1,14 +1,8 @@
-
 import socket
 from contextlib import closing
 from math import ceil
+import pickle
 import zmq
-
-PRODUCER_SENDER_PORT = CONSUMER1_RECEIVER_PORT = 59375
-CONSUMER1_SENDER_PORT = COLLECTOR_RECEIVER_PORT = 50042
-COLLECTOR_SENDER_PORT = CONSUMER2_RECEIVER_PORT = 50043
-CONSUMER2_SENDER_PORT = FINAL_COLLECTOR_RECEIVER_PORT = 50044
-
 
 def configure_Subscriber(publishers_data):
     context = zmq.Context()
@@ -47,6 +41,18 @@ def get_ip():
     with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as s:
         s.connect(("8.8.8.8", 80))
         return s.getsockname()[0]
+
+def msg_to_image(message):
+    message = pickle.loads(message)
+    frameNum = message["frameNum"]
+    image = message["img"]
+    return frameNum, image
+
+def image_to_msg(frameNum, frame):
+    msgD = {"frameNum": frameNum, "img": frame}
+    msg = pickle.dumps(msgD)
+    return msg
+
 
 #SENDER = ("192.168.1.6", "50041")
 #RECIEVER = ("192.168.1.6", "36865")
