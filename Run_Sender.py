@@ -24,9 +24,8 @@ def main():
         socket = context.socket(zmq.PAIR)
         socket.connect(
             "tcp://{}:{}".format(utils.RECIEVER, utils.CONNECTION_PORT))
-        portList = pickle.loads(socket.recv())
+        Consumers2_Receiving_Ports = pickle.loads(socket.recv())
         print("Port list has been recieved")
-        print("reciever: ", portList)
     except:
         print("Machine 1 (Sender) ERROR IN Recieving CONNECTION DATA, Try Chaning the CONNECTION_PORT in utils.py file")
 
@@ -52,6 +51,7 @@ def main():
     for i in range(0, utils.N, 2):
         Two_Receiving_Ports = " ".join(Consumers1_Sending_Ports[i: i+2])
         Two_Sending_Ports = " ".join(Consumers2_Receiving_Ports[i: i+2])
+        print(Two_Sending_Ports)
         commands.append('python Collector.py {} {}'.format(
             Two_Receiving_Ports, Two_Sending_Ports))
     #######################################################################################
