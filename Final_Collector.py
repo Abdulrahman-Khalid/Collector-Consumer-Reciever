@@ -17,6 +17,7 @@ while True:
     dictionaryFrames[frame_data["frameNum"]] = frame_data
     # print("Frame #{} Recieved".format(frame_data["frameNum"]))
     # To print in order
+    print("frame #{} is loaded...".format(frame_data["frameNum"]))
     if(frame_data["frameNum"] == orderNum):
         imgToOut = dictionaryFrames[orderNum]
         # To print this frame info
