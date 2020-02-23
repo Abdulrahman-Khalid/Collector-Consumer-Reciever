@@ -4,11 +4,6 @@ from math import ceil
 import pickle
 import zmq
 
-# Constants
-N = 15
-SENDER = "192.168.1.6"
-RECIEVER = "192.168.1.6"
-CONNECTION_PORT = "60175"
 
 # Functions
 
@@ -67,3 +62,10 @@ def image_to_msg(frameNum, frame):
     msgD = {"frameNum": frameNum, "img": frame}
     msg = pickle.dumps(msgD)
     return msg
+
+
+# Constants
+N = 4
+SENDER = get_ip()
+RECIEVER = get_ip()
+CONNECTION_PORT = "60175"
