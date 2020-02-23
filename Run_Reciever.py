@@ -17,7 +17,7 @@ def main():
         Consumers2_Receiving_Ports.append(
             "{}:{}".format(utils.RECIEVER, utils.find_free_port()))
         Consumers2_Sending_Ports.append(
-            "{}:{}".format(utils.RECIEVER, utils.find_free_port()))
+            "{}:{}".format(utils.get_ip(), utils.find_free_port()))
     ################################################################
     # connect to the SENDER COMPUTER and sends
     try:

@@ -27,9 +27,9 @@ def main():
 
     for i in range(utils.N):
         Consumers1_Receiving_Ports.append(
-            utils.SENDER + ":" + str(utils.find_free_port()))
+            str(utils.get_ip()) + ":" + str(utils.find_free_port()))
         Consumers1_Sending_Ports.append(
-            utils.SENDER + ":" + str(utils.find_free_port()))
+            str(utils.get_ip()) + ":" + str(utils.find_free_port()))
 
     #######################################################################################
     Consumers1_Receiving_Ports_string = " ".join(Consumers1_Receiving_Ports)
