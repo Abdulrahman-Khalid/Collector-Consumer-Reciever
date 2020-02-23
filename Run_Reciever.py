@@ -24,10 +24,7 @@ def main():
     except:
         print("Machine 2 (Reciever) ERROR IN RECIVING CONNECTION DATA," + 
                 "Try Chaning the CONNECTION_PORT in utils.py file")
-    #finally:
-    #    recieverSocket.close()
-    #    recieverContext.destroy()
-    
+
     # Generate needed Processes
     # Generate N Consumers2
     for i in range(utils.N):
@@ -43,6 +40,9 @@ def main():
     processes = [Popen(cmd, shell=True) for cmd in commands]
     for p in processes:
         p.wait()
+
+    recieverSocket.close()
+    recieverContext.destroy()
 
 
 if __name__ == '__main__':

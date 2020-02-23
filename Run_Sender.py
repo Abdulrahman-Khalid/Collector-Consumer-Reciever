@@ -33,9 +33,6 @@ def main():
     except:
         print("Machine 1 (Sender) ERROR IN SENDING CONNECTION DATA, " +
             "Try Chaning the CONNECTION_PORT in utils.py file")
-    #finally:
-    #    senderSocket.close()
-    #    senderContext.destroy()
 
 
     # Generate needed Processes
@@ -56,6 +53,9 @@ def main():
     processes = [Popen(cmd, shell=True) for cmd in commands]
     for p in processes:
         p.wait()
+
+    senderSocket.close()
+    senderContext.destroy()
 
 
 if __name__ == '__main__':
