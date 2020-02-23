@@ -47,6 +47,6 @@ def image_to_msg(frameNum, frame):
 
 # Constants
 N = 4
-SENDER = get_ip()
-RECIEVER = get_ip()
+SENDER = "25.94.80.145"
+RECIEVER = "25.94.85.0"
 CONNECTION_PORT = "60175"
