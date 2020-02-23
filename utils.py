@@ -7,36 +7,17 @@ import zmq
 
 # Functions
 
-
-def configure_Subscriber(publishers_data):
+def configure_port(ipPort, portType, connectionType):
     context = zmq.Context()
-    socket = context.socket(zmq.PULL)
-    for publisher in publishers_data:
-        socket.connect("tcp://" + publisher)
-    return socket
-
-
-def configure_Publisher(publisher):
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    socket.bind("tcp://{}".format(publisher))
-    return socket
-
-
-def configure_Requester(Repliers_data):
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    for Replier in Repliers_data:
-        socket.connect("tcp://" + Replier)
-    return socket
-
-
-def configure_Replier(Replier):
-    context = zmq.Context()
-    socket = context.socket(zmq.PULL)
-    socket.bind("tcp://" + Replier)
-    return socket
-
+    socket = context.socket(portType)
+    socket.setsockopt( zmq.LINGER,      0 )  # ____POLICY: set upon instantiations
+    socket.setsockopt( zmq.AFFINITY,    1 )  # ____POLICY: map upon IO-type thread
+    socket.setsockopt( zmq.RCVTIMEO, 2000 )
+    if(connectionType == "connect"):
+        socket.connect("tcp://" + ipPort)
+    else:
+        socket.bind("tcp://" + ipPort)
+    return socket, context
 
 def find_free_port():
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:

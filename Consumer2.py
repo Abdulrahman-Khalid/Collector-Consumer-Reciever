@@ -23,11 +23,19 @@ def get_contours(frameNum, image):
     return pickle.dumps({"frameNum": frameNum, "contours": frame_data})
 
 
-senderSocket = utils.configure_Publisher(sys.argv[2])
-receiverSocket = utils.configure_Replier(sys.argv[1])
+receiverSocket, receiverContext = utils.configure_port(sys.argv[1], zmq.PULL , "connect")
+senderSocket, senderContext = utils.configure_port(sys.argv[2], zmq.PUSH , "connect")
 
-while True:
-    message = receiverSocket.recv()
-    frameNum, image = utils.msg_to_image(message)
-    data = get_contours(frameNum, image)
-    senderSocket.send(data)
+try:
+    while True:
+        message = receiverSocket.recv()
+        frameNum, image = utils.msg_to_image(message)
+        data = get_contours(frameNum, image)
+        senderSocket.send(data)
+except:
+    pass
+finally:
+    receiverSocket.close()
+    senderSocket.close()  
+    senderContext.destroy()                    
+    receiverContext.destroy()                       

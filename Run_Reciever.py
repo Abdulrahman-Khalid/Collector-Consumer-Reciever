@@ -4,41 +4,42 @@ import sys
 import json
 import pickle
 import zmq
-
+import math
 
 def main():
     outputPath = str(sys.argv[1])
     print("Your ip is: {}".format(utils.get_ip()))
-    print("Your free port is: {}".format(utils.find_free_port()))
+    
     commands = []
-    Consumers2_Receiving_Ports = []
-    Consumers2_Sending_Ports = []
-    for i in range(utils.N):
-        Consumers2_Receiving_Ports.append(
-            "{}:{}".format(utils.RECIEVER, utils.find_free_port()))
-        Consumers2_Sending_Ports.append(
-            "{}:{}".format(utils.get_ip(), utils.find_free_port()))
-    ################################################################
-    # connect to the SENDER COMPUTER and sends
+    Collector_Sending_Ports = []
+
+    # Generate needed random free ports
+    finalCollectorPort = str(utils.get_ip()) + ":" + str(utils.find_free_port())
+    
+    # Recieve Collector Ports from frst computer
     try:
-        context = zmq.Context()
-        socket = context.socket(zmq.PAIR)
-        socket.bind("tcp://{}:{}".format(utils.RECIEVER, utils.CONNECTION_PORT))
-        data = pickle.dumps(Consumers2_Receiving_Ports)
-        socket.send(data)
-        print("Port list has been sent")
+        ipPortConnecton = str(utils.RECIEVER) + ":" +  utils.CONNECTION_PORT
+        recieverSocket, recieverContext = utils.configure_port(ipPortConnecton, zmq.PULL, "connect")
+        Collector_Sending_Ports = pickle.loads(recieverSocket.recv())
     except:
-        print("Machine 2 (Reciever) ERROR IN SENDING CONNECTION DATA, Try Chaning the CONNECTION_PORT in utils.py file")
-    ################################################################
+        print("Machine 2 (Reciever) ERROR IN RECIVING CONNECTION DATA," + 
+                "Try Chaning the CONNECTION_PORT in utils.py file")
+    #finally:
+    #    recieverSocket.close()
+    #    recieverContext.destroy()
+    
+    # Generate needed Processes
+    # Generate N Consumers2
     for i in range(utils.N):
         commands.append('python Consumer2.py {} {}'.format(
-            Consumers2_Receiving_Ports[i], Consumers2_Sending_Ports[i]))
-    ################################################################
-    Consumers2_Sending_Ports_string = " ".join(Consumers2_Sending_Ports)
+            Collector_Sending_Ports[math.floor(i/2)], finalCollectorPort))
+
+    # Generate Final Collector
     commands.append('python Final_Collector.py {} {}'.format(
-        outputPath, Consumers2_Sending_Ports_string))
-    ################################################################
-    # run in parallel
+        outputPath, finalCollectorPort))
+
+
+    # Run in parallel
     processes = [Popen(cmd, shell=True) for cmd in commands]
     for p in processes:
         p.wait()

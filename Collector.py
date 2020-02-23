@@ -2,19 +2,17 @@ import zmq
 import sys
 import utils
 
+receiverSocket, receiverContext = utils.configure_port(str(sys.argv[1]), zmq.PULL, "bind")
+senderSocket, senderContext = utils.configure_port(str(sys.argv[2]), zmq.PUSH, "bind")
 
-Publishers = []
-for Publisher in sys.argv[1:3]:
-    Publishers.append(Publisher)
-
-Repliers = []
-for Replier in sys.argv[3:5]:
-    Repliers.append(Replier)
-
-
-receiverSocket = utils.configure_Subscriber(Publishers)
-senderSocket = utils.configure_Requester(Repliers)
-
-while True:
-    message = receiverSocket.recv()
-    senderSocket.send(message)
+try:
+    while True:
+        message = receiverSocket.recv()
+        senderSocket.send(message)
+except:
+    pass
+finally:
+    receiverSocket.close()
+    senderSocket.close()  
+    senderContext.destroy()                    
+    receiverContext.destroy()  
