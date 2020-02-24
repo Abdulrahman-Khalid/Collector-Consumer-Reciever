@@ -10,14 +10,17 @@ import zmq
 def configure_port(ipPort, portType, connectionType):
     context = zmq.Context()
     socket = context.socket(portType)
-    socket.setsockopt( zmq.LINGER,      0 )  # ____POLICY: set upon instantiations
-    socket.setsockopt( zmq.AFFINITY,    1 )  # ____POLICY: map upon IO-type thread
-    socket.setsockopt( zmq.RCVTIMEO, 2000 )
+    # ____POLICY: set upon instantiations
+    socket.setsockopt(zmq.LINGER,      0)
+    # ____POLICY: map upon IO-type thread
+    socket.setsockopt(zmq.AFFINITY,    1)
+    socket.setsockopt(zmq.RCVTIMEO, 30000)
     if(connectionType == "connect"):
         socket.connect("tcp://" + ipPort)
     else:
         socket.bind("tcp://" + ipPort)
     return socket, context
+
 
 def find_free_port():
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -45,8 +48,12 @@ def image_to_msg(frameNum, frame):
     return msg
 
 
-# Constants
-N = 4
-SENDER = "25.94.80.145"
-RECIEVER = "25.94.85.0"
+# Constants #
+##########################
+N = 5
+SENDER = "192.168.1.9"
+RECIEVER = "192.168.1.5"
 CONNECTION_PORT = "60175"
+##########################
+# SENDER = get_ip()
+# RECIEVER = get_ip()
