@@ -10,9 +10,7 @@ import zmq
 def configure_port(ipPort, portType, connectionType):
     context = zmq.Context()
     socket = context.socket(portType)
-    # ____POLICY: set upon instantiations
     socket.setsockopt(zmq.LINGER,      0)
-    # ____POLICY: map upon IO-type thread
     socket.setsockopt(zmq.AFFINITY,    1)
     socket.setsockopt(zmq.RCVTIMEO, 30000)
     if(connectionType == "connect"):
@@ -51,8 +49,8 @@ def image_to_msg(frameNum, frame):
 # Constants #
 ##########################
 N = 5
-SENDER = "192.168.1.9"
-RECIEVER = "192.168.1.5"
+SENDER = "192.168.1.8"
+RECIEVER = "192.168.1.9"
 CONNECTION_PORT = "60175"
 ##########################
 # SENDER = get_ip()
